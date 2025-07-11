@@ -7,6 +7,7 @@ import json
 import argparse
 
 from PIL import Image
+from utils import destroy_all_actors, move_walker_forward
 
 # Global variables to store image name, data directory, and image dimensions
 image_name = ""
@@ -23,13 +24,13 @@ def parse_arguments():
     parser.add_argument('--spectate', type=bool, default=False, help="True if you want to spectate the simulation while data is created.")
     parser.add_argument("--vehicle_id", type=int, default=29, help="ID of the vehicle to spawn")
     parser.add_argument("--cam_init_loc", type=str, default="1.5, 0, 1.2", help="Should be adjusted depending on the vehicle used.")
-    parser.add_argument("--pedestrian_id", type=int, default=1, help="ID of the walker to spawn")
+    parser.add_argument("--pedestrian_id", type=int, default=1, help="ID of the pedestrian to spawn")
     parser.add_argument('--image_width', type=int, default=1920, help='Width of the saved image')
     parser.add_argument('--image_height', type=int, default=1080, help='Height of the saved image')
     parser.add_argument("--wait_time", type=float, default=0.5, help='Time to wait between actions')
     parser.add_argument('--port_number', type=int, default=2000, help="Port number for CARLA server connection")
+    parser.add_argument("--question", type=str, default="Are there any pedestrians crossing the road?")
     return parser.parse_args()
-
 
 def save_image(image):
     """
@@ -50,64 +51,15 @@ def save_image(image):
     image.save_to_disk(image_path)
 
     with Image.open(image_path) as img:
-        img = img.resize((1920, 1080), Image.LANCZOS)
+        img = img.resize((image_width, image_height), Image.LANCZOS)
         img.save(image_path)
-
-
-def destroy_all_actors(world):
-    """
-    Destroy all actors in the CARLA world.
-    
-    Args:
-        world: carla.World - The CARLA world object.
-    """
-    actors = world.get_actors()
-
-    cameras = actors.filter("sensor.camera.rgb")
-    for camera in cameras:
-        camera.destroy()
-        time.sleep(args.wait_time)
-
-    vehicles = actors.filter("vehicle.*")
-    for vehicle in vehicles:
-        vehicle.destroy()
-        time.sleep(args.wait_time)
-
-    walkers = actors.filter("walker.*")
-    for walker in walkers:
-        walker.destroy()
-        time.sleep(args.wait_time)
-
-
-def move_walker_forward(walker, speed):
-    """
-    Move a walker forward in their current facing direction.
-    
-    Args:
-        walker: carla.Walker - The walker actor.
-        speed: float - Walking speed in m/s.
-    """
-    # Get the walker's current transform
-    transform = walker.get_transform()
-    
-    # Create a control object for the walker
-    control = carla.WalkerControl()
-    
-    # Set the direction to the walker's forward vector
-    control.direction = transform.get_forward_vector()
-    
-    # Set the walking speed
-    control.speed = speed
-    
-    # Apply the control
-    walker.apply_control(control)
 
 
 def main(args):
     global image_name
     # Connect to the server and retrieve the world object
     client = carla.Client('localhost', args.port_number)
-    client.set_timeout(args.wait_time*12)  # Some maps need a lot of time to load so it's better to increase the timeout
+    client.set_timeout(args.wait_time*120)  # Some maps need a lot of time to load so it's better to increase the timeout
     world = client.get_world()
 
     town = args.map
@@ -153,6 +105,32 @@ def main(args):
         carla.WeatherParameters.DustStorm
     ]
 
+    # Map weather conditions to descriptions so it can't be saved in a json file
+    weather_description = {
+        carla.WeatherParameters.ClearNoon: "Clear Noon",
+        carla.WeatherParameters.CloudyNoon: "Cloudy Noon",
+        carla.WeatherParameters.WetNoon: "Wet Noon",
+        carla.WeatherParameters.WetCloudyNoon: "Wet Cloudy Noon",
+        carla.WeatherParameters.MidRainyNoon: "Mid Rainy Noon",
+        carla.WeatherParameters.HardRainNoon: "Hard Rain Noon",
+        carla.WeatherParameters.SoftRainNoon: "Soft Rain Noon",
+        carla.WeatherParameters.ClearSunset: "Clear Sunset",
+        carla.WeatherParameters.CloudySunset: "Cloudy Sunset",
+        carla.WeatherParameters.WetSunset: "Wet Sunset",
+        carla.WeatherParameters.WetCloudySunset: "Wet Cloudy Sunset",
+        carla.WeatherParameters.MidRainSunset: "Mid Rain Sunset",
+        carla.WeatherParameters.HardRainSunset: "Hard Rain Sunset",
+        carla.WeatherParameters.SoftRainSunset: "Soft Rain Sunset",
+        carla.WeatherParameters.ClearNight: "Clear Night",
+        carla.WeatherParameters.CloudyNight: "Cloudy Night",
+        carla.WeatherParameters.WetNight: "Wet Night",
+        carla.WeatherParameters.WetCloudyNight: "Wet Cloudy Night",
+        carla.WeatherParameters.MidRainyNight: "Mid Rainy Night",
+        carla.WeatherParameters.HardRainNight: "Hard Rain Night",
+        carla.WeatherParameters.SoftRainNight: "Soft Rain Night",
+        carla.WeatherParameters.DustStorm: "Dust Storm"
+    }
+
     # Keep a count of the number of samples generated
     cnt = 0
 
@@ -180,7 +158,7 @@ def main(args):
             # Spawn the vehicle and disable physics
             vehicle = world.spawn_actor(vehicle_blueprints[args.vehicle_id], spawn_transform)
             time.sleep(args.wait_time)
-            vehicle.set_simulate_physics(False)
+            vehicle.set_simulate_physics(False)  # We don't want the vehicle to start moving if it happens to be spawned on a downhill
 
             # Turn on the high beam lights if it's night
             if random_weather.sun_altitude_angle < 0:
@@ -189,7 +167,7 @@ def main(args):
                 time.sleep(args.wait_time/5)
         except:
             # If spawning fails, destroy all actors and continue
-            destroy_all_actors(world)
+            destroy_all_actors(world, args.wait_time)
             continue
 
         # Get the forward vector of the vehicle
@@ -242,12 +220,12 @@ def main(args):
                 z=0.2
             )
 
-            # Check if the pedestrian location is valid
+            # Check if the pedestrian location is valid (road or shoulder)
             waypoint_driving = carla_map.get_waypoint(pedestrian_location, project_to_road=False, lane_type=carla.LaneType.Driving)
             waypoint_shoulder = carla_map.get_waypoint(pedestrian_location, project_to_road=False, lane_type=carla.LaneType.Shoulder)
             
             if waypoint_driving is None and waypoint_shoulder is None:
-                destroy_all_actors(world)
+                destroy_all_actors(world, args.wait_time)
                 break
 
             # Spawn the pedestrian
@@ -260,7 +238,7 @@ def main(args):
                 move_walker_forward(pedestrian, speed=speed)
                 time.sleep(args.wait_time)
             except:
-                destroy_all_actors(world)
+                destroy_all_actors(world, args.wait_time)
                 break
 
             # Check if the pedestrian is occluded
@@ -273,7 +251,7 @@ def main(args):
                     break
 
             if occluded:
-                destroy_all_actors(world)
+                destroy_all_actors(world, args.wait_time)
                 break
 
             # Capture the image
@@ -313,7 +291,7 @@ def main(args):
             # Save a json annotation file
             if not os.path.exists(f"{args.data_dir}/annotations.json"):
                 dataset = {
-                    "question": "Are there any pedestrians crossing the road?",
+                    "question": args.question,
                     "answers": ["Yes", "Yes", "Yes", "Yes", "Yes", "Yes", "No"],  # One per distance
                     "distances": [50, 40, 30, 20, 10, 5, None],
                     "samples": []
@@ -321,32 +299,6 @@ def main(args):
             else:
                 with open(f"{args.data_dir}/annotations.json") as f:
                     dataset = json.load(f)
-
-            # Map weather conditions to descriptions so it can't be saved in a json file
-            weather_description = {
-                carla.WeatherParameters.ClearNoon: "Clear Noon",
-                carla.WeatherParameters.CloudyNoon: "Cloudy Noon",
-                carla.WeatherParameters.WetNoon: "Wet Noon",
-                carla.WeatherParameters.WetCloudyNoon: "Wet Cloudy Noon",
-                carla.WeatherParameters.MidRainyNoon: "Mid Rainy Noon",
-                carla.WeatherParameters.HardRainNoon: "Hard Rain Noon",
-                carla.WeatherParameters.SoftRainNoon: "Soft Rain Noon",
-                carla.WeatherParameters.ClearSunset: "Clear Sunset",
-                carla.WeatherParameters.CloudySunset: "Cloudy Sunset",
-                carla.WeatherParameters.WetSunset: "Wet Sunset",
-                carla.WeatherParameters.WetCloudySunset: "Wet Cloudy Sunset",
-                carla.WeatherParameters.MidRainSunset: "Mid Rain Sunset",
-                carla.WeatherParameters.HardRainSunset: "Hard Rain Sunset",
-                carla.WeatherParameters.SoftRainSunset: "Soft Rain Sunset",
-                carla.WeatherParameters.ClearNight: "Clear Night",
-                carla.WeatherParameters.CloudyNight: "Cloudy Night",
-                carla.WeatherParameters.WetNight: "Wet Night",
-                carla.WeatherParameters.WetCloudyNight: "Wet Cloudy Night",
-                carla.WeatherParameters.MidRainyNight: "Mid Rainy Night",
-                carla.WeatherParameters.HardRainNight: "Hard Rain Night",
-                carla.WeatherParameters.SoftRainNight: "Soft Rain Night",
-                carla.WeatherParameters.DustStorm: "Dust Storm"
-            }
 
             # Create annotations for the current sample
             annotations = {
@@ -364,7 +316,7 @@ def main(args):
                 json.dump(dataset, f)
 
         # Destroy all actors after each sample
-        destroy_all_actors(world)
+        destroy_all_actors(world, args.wait_time)
 
 
 if __name__ == '__main__':
