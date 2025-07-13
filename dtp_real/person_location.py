@@ -82,11 +82,11 @@ def main(args):
 
             layers = get_surface_type(nusc, datum["annotation"])
             if layers["ped_crossing"]:
-                new_datum["answer"] = "crossing"
+                new_datum["answer"] = "Crosswalk"
             elif layers["walkway"]:
-                new_datum["answer"] = "sidewalk"
+                new_datum["answer"] = "Sidewalk"
             elif layers["drivable_area"]:
-                new_datum["answer"] = "road"
+                new_datum["answer"] = "Road"
             else:
                 continue 
 
