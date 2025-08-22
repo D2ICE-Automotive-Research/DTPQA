@@ -19,16 +19,16 @@ image_height = 0
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--map", type=str, help="Map to use for the simulation")
-    parser.add_argument('--data_dir', type=str, help="Directory to save the data")
-    parser.add_argument("--num_samples", type=int, default=20, help='Number of samples to generate')
-    parser.add_argument('--spectate', type=bool, default=False, help="True if you want to spectate the simulation while data is created.")
+    parser.add_argument("--data_dir", type=str, help="Directory to save the data")
+    parser.add_argument("--num_samples", type=int, default=20, help="Number of samples to generate")
+    parser.add_argument("--spectate", type=bool, default=False, help="True if you want to spectate the simulation while data is created.")
     parser.add_argument("--vehicle_id", type=int, default=29, help="ID of the vehicle to spawn")
     parser.add_argument("--cam_init_loc", type=str, default="1.5, 0, 1.2", help="Should be adjusted depending on the vehicle used.")
     parser.add_argument("--pedestrian_id", type=int, default=1, help="ID of the pedestrian to spawn")
-    parser.add_argument('--image_width', type=int, default=1920, help='Width of the saved image')
-    parser.add_argument('--image_height', type=int, default=1080, help='Height of the saved image')
-    parser.add_argument("--wait_time", type=float, default=0.5, help='Time to wait between actions')
-    parser.add_argument('--port_number', type=int, default=2000, help="Port number for CARLA server connection")
+    parser.add_argument("--image_width", type=int, default=1920, help="Width of the saved image")
+    parser.add_argument("--image_height", type=int, default=1080, help="Height of the saved image")
+    parser.add_argument("--wait_time", type=float, default=0.5, help="Time to wait between actions")
+    parser.add_argument("--port_number", type=int, default=2000, help="Port number for CARLA server connection")
     parser.add_argument("--question", type=str, default="What's the colour of the traffic light?")
     return parser.parse_args()
 
@@ -45,8 +45,8 @@ def save_image(image):
     global image_height
 
     current_time = int(time.time() * 1000)
-    image_path = f'{data_dir}/images/{current_time}.png'
-    image_name = f'{current_time}.png'
+    image_path = f"{data_dir}/images/{current_time}.png"
+    image_name = f"{current_time}.png"
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
     image.save_to_disk(image_path)
 
@@ -140,7 +140,7 @@ def main(args):
                  "Town15": [4.0, True, [50.0, 40.0, 30.0, 20.0]],}
     
     # Connect to the CARLA server
-    client = carla.Client('localhost', args.port_number)
+    client = carla.Client("localhost", args.port_number)
     client.set_timeout(args.wait_time*120)  # Some maps need a lot of time to load so it's better to increase the timeout
     world = client.get_world()
 
@@ -161,7 +161,7 @@ def main(args):
     driving_waypoints = [wp for wp in waypoints if wp.lane_type == carla.LaneType.Driving]
 
     # Get vehicle blueprints for spawning
-    vehicle_blueprints = world.get_blueprint_library().filter('*vehicle*')
+    vehicle_blueprints = world.get_blueprint_library().filter("*vehicle*")
 
     # Define different weather conditions
     weather_conditions = [
@@ -189,7 +189,7 @@ def main(args):
         carla.WeatherParameters.DustStorm
     ]
 
-    # Map weather conditions to descriptions so it can't be saved in a json file
+    # Map weather conditions to descriptions so it can be saved in a json file
     weather_description = {
         carla.WeatherParameters.ClearNoon: "Clear Noon",
         carla.WeatherParameters.CloudyNoon: "Cloudy Noon",
@@ -219,7 +219,7 @@ def main(args):
 
     # Get all traffic lights in the world
     actors = world.get_actors()
-    traffic_lights = actors.filter('traffic.traffic_light')
+    traffic_lights = actors.filter("traffic.traffic_light")
     traffic_lights = list(traffic_lights)
     traffic_lights_states = ["Green", "Yellow", "Red"]
 
@@ -309,14 +309,14 @@ def main(args):
                 break
 
             # Create camera transform relative to the vehicle
-            init_loc = args.cam_init_loc.split(',')
+            init_loc = args.cam_init_loc.split(",")
             init_loc = [float(loc) for loc in init_loc]
             camera_init_trans = carla.Transform(carla.Location(init_loc[0], init_loc[1], init_loc[2]))
 
             # Create camera blueprint with high resolution
-            camera_bp = world.get_blueprint_library().find('sensor.camera.rgb')
-            camera_bp.set_attribute('image_size_x', '3840')
-            camera_bp.set_attribute('image_size_y', '2160')
+            camera_bp = world.get_blueprint_library().find("sensor.camera.rgb")
+            camera_bp.set_attribute("image_size_x", "3840")
+            camera_bp.set_attribute("image_size_y", "2160")
 
             # Spawn camera attached to the vehicle
             camera = world.spawn_actor(camera_bp, camera_init_trans, attach_to=vehicle)
@@ -378,7 +378,7 @@ def main(args):
         if images_to_delete > 0:
             time.sleep(2)
             # Get the list of image files in the output directory
-            image_files = sorted(glob.glob(f'{args.data_dir}/images/*.png'), key=os.path.getmtime)
+            image_files = sorted(glob.glob(f"{args.data_dir}/images/*.png"), key=os.path.getmtime)
 
             # Delete the last "images_to_delete" number of images
             for image_file in image_files[-images_to_delete:]:
@@ -418,7 +418,7 @@ def main(args):
         destroy_all_actors(world, args.wait_time)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parse_arguments()
     data_dir = args.data_dir
     image_width = args.image_width
