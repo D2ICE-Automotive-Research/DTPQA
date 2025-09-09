@@ -85,7 +85,7 @@ def main(args):
         distance_2 = calculate_distance(datum["car_translation"], datum["car_rotation"], datum["pedestrians_translation"][1], datum["camera_translation"])
         avg_distance = (distance_1 + distance_2) / 2
         variance = np.var([distance_1, distance_2])
-        if distance_1 < args.bins[-1] + 5 and args.bins[-1] + 5:  # Keep only the samples that have a distance less than max_bin + 5 meters
+        if distance_1 < args.bins[-1] + 5 and distance_2 < args.bins[-1] + 5:  # Keep only the samples that have a distance less than max_bin + 5 meters
             new_datum["filename"] = datum["filename"]
             new_datum["question"] = args.question
             new_datum["answer"] = "Two"
