@@ -59,7 +59,7 @@ def main(args):
     global image_name
     # Connect to the server and retrieve the world object
     client = carla.Client("localhost", args.port_number)
-    client.set_timeout(args.wait_time*120)  # Some maps need a lot of time to load so it's better to increase the timeout
+    client.set_timeout(args.wait_time * 120)  # Some maps need a lot of time to load so it's better to increase the timeout
     world = client.get_world()
 
     town = args.map
@@ -153,7 +153,7 @@ def main(args):
                 spectator_location = carla.Location(spawn_location.x, spawn_location.y, spawn_location.z + 20)
                 spectator_rotation = carla.Rotation(pitch=-90)
                 spectator.set_transform(carla.Transform(spectator_location, spectator_rotation))
-                time.sleep(args.wait_time*4)
+                time.sleep(args.wait_time * 4)
 
             # Spawn the vehicle and disable physics
             vehicle = world.spawn_actor(vehicle_blueprints[args.vehicle_id], spawn_transform)
@@ -164,7 +164,7 @@ def main(args):
             if random_weather.sun_altitude_angle < 0:
                 light_state = carla.VehicleLightState.HighBeam
                 vehicle.set_light_state(light_state)
-                time.sleep(args.wait_time/5)
+                time.sleep(args.wait_time / 5)
         except:
             # If spawning fails, destroy all actors and continue
             destroy_all_actors(world, args.wait_time)
@@ -258,7 +258,7 @@ def main(args):
             camera.listen(save_image)
             image_taken = True
             images_to_delete += 1
-            time.sleep(args.wait_time/2)
+            time.sleep(args.wait_time / 2)
             camera.stop()
             filenames.append(image_name)
             pedestrian.destroy()
@@ -268,7 +268,7 @@ def main(args):
 
         # Delete images if necessary
         if images_to_delete > 0:
-            time.sleep(args.wait_time*4)
+            time.sleep(args.wait_time * 4)
             # Get the list of image files in the output directory
             image_files = sorted(glob.glob(f"{args.data_dir}/images/*.png"), key=os.path.getmtime)
 
@@ -283,7 +283,7 @@ def main(args):
         # Save the final empty image and annotations
         if image_taken:
             camera.listen(save_image)
-            time.sleep(args.wait_time/2)
+            time.sleep(args.wait_time / 2)
             camera.stop()
             filenames.append(image_name)
             cnt += 1

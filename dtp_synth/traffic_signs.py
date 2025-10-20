@@ -142,7 +142,7 @@ def main(args):
     
     # Connect to the CARLA simulator client
     client = carla.Client("localhost", args.port_number)
-    client.set_timeout(args.wait_time*120)  # Some maps need a lot of time to load so it's better to increase the timeout
+    client.set_timeout(args.wait_time * 120)  # Some maps need a lot of time to load so it's better to increase the timeout
     world = client.get_world()
 
     town = args.map

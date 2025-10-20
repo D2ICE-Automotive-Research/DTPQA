@@ -154,7 +154,7 @@ def main(args):
     global image_name
     # Connect to the server and retrieve the world object
     client = carla.Client("localhost", args.port_number)
-    client.set_timeout(args.wait_time*120)  # Some maps need a lot of time to load so it's better to increase the timeout
+    client.set_timeout(args.wait_time * 120)  # Some maps need a lot of time to load so it's better to increase the timeout
     world = client.get_world()
 
     town = args.map
@@ -245,7 +245,7 @@ def main(args):
                 spectator_location = carla.Location(spawn_location.x, spawn_location.y, spawn_location.z + 20)
                 spectator_rotation = carla.Rotation(pitch=-90)
                 spectator.set_transform(carla.Transform(spectator_location, spectator_rotation))
-                time.sleep(args.wait_time*4)
+                time.sleep(args.wait_time * 4)
 
             # Spawn the vehicle
             vehicle = world.spawn_actor(vehicle_blueprints[args.vehicle_id], spawn_transform)
@@ -256,7 +256,7 @@ def main(args):
             if random_weather.sun_altitude_angle < 0:
                 light_state = carla.VehicleLightState.HighBeam
                 vehicle.set_light_state(light_state)
-                time.sleep(args.wait_time/5)
+                time.sleep(args.wait_time / 5)
         except:
             destroy_all_actors(world, args.wait_time)
             continue
@@ -312,7 +312,7 @@ def main(args):
             try:
                 # Spawn the truck
                 truck = world.spawn_actor(vehicle_blueprints[args.truck_id], truck_transform)
-                time.sleep(args.wait_time*4)
+                time.sleep(args.wait_time * 4)
                 truck.set_simulate_physics(False)
                 default_light_state = vehicle.get_light_state()
                 truck.set_light_state(default_light_state)
