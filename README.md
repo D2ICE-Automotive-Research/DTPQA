@@ -1,5 +1,9 @@
 # Distance-Annotated Traffic Perception Question Answering (DTPQA)
 
+## 📄 Paper & Dataset
+- 📜 **Paper**: [Read here](link)  
+- 📁 **Dataset**: [Access here](link)
+
 This repository contains the code used to generate **DTPQA**, a Visual Question Answering (VQA) benchmark designed to evaluate the **perception capabilities of Vision-Language Models (VLMs)** in traffic scenes.  
 DTPQA consists of two main components:  
 - **DTP-Synth**, generated using [CARLA](https://github.com/carla-simulator/carla)  
@@ -14,11 +18,6 @@ DTPQA consists of two main components:
 - **10** data types  
 - Multiple environments and weather conditions  
 - Distance annotations for each object in question
-
-## 📄 Paper & Dataset
-
-- 📜 **Paper**: [Read here](link)  
-- 📁 **Dataset**: [Access here](link)
 
 ## Code Structure
 
