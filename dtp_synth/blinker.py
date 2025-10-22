@@ -20,7 +20,7 @@ image_height = 0
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--map", type=str, help="Map to use for the simulation")
-    parser.add_argument("--data_dir", type=str, help="Directory to save the data")
+    parser.add_argument("--save_path", type=str, help="Directory to save the data")
     parser.add_argument("--blinker_annotations", type=str, help="Path to the blinker annotations file")
     parser.add_argument("--num_samples", type=int, default=20, help="Number of samples to generate")
     parser.add_argument("--spectate", type=bool, default=False, help="True if you want to spectate the simulation while data is created.")
@@ -363,7 +363,7 @@ def main(args):
                 camera.stop()
                 
                 # Check for good images based on blinker brightness criteria
-                filename = check_for_good_images(args.data_dir, draft_dir, blinker_annotations, distance, blinker)
+                filename = check_for_good_images(args.save_path, draft_dir, blinker_annotations, distance, blinker)
             
             # If no good image is found, print a message and break the loop
             if filename is None:
@@ -385,7 +385,7 @@ def main(args):
         if images_to_delete > 0:
             time.sleep(args.wait_time * 4)
             # Get the list of image files in the output directory
-            image_files = sorted(glob.glob(f"{args.data_dir}/images/*.png"), key=os.path.getmtime)
+            image_files = sorted(glob.glob(f"{args.save_path}/images/*.png"), key=os.path.getmtime)
 
             # Delete the last "images_to_delete" number of images
             for image_file in image_files[-images_to_delete:]:
@@ -399,14 +399,14 @@ def main(args):
             cnt += 1
 
             # Save a json annotation file
-            if not os.path.exists(f"{args.data_dir}/annotations.json"):
+            if not os.path.exists(f"{args.save_path}/annotations.json"):
                 dataset = {
                     "question": args.question,
                     "distances": [50, 40, 30, 20, 10, 5],
                     "samples": []
                 }
             else:
-                with open(f"{args.data_dir}/annotations.json") as f:
+                with open(f"{args.save_path}/annotations.json") as f:
                     dataset = json.load(f)
 
             annotations = {
@@ -418,7 +418,7 @@ def main(args):
 
             dataset["samples"].append(annotations)
 
-            with open(f"{args.data_dir}/annotations.json", "w") as f:
+            with open(f"{args.save_path}/annotations.json", "w") as f:
                 json.dump(dataset, f)
 
         destroy_all_actors(world, args.wait_time)
@@ -426,7 +426,7 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    draft_dir = args.data_dir + "/draft_images"
+    draft_dir = args.save_path + "/draft_images"
     image_width = args.image_width
     image_height = args.image_height
     main(args)

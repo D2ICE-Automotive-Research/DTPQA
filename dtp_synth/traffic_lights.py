@@ -11,7 +11,7 @@ from utils import destroy_all_actors
 
 
 image_name = ""
-data_dir = ""
+save_path = ""
 image_width = 0
 image_height = 0
 
@@ -19,7 +19,7 @@ image_height = 0
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--map", type=str, help="Map to use for the simulation")
-    parser.add_argument("--data_dir", type=str, help="Directory to save the data")
+    parser.add_argument("--save_path", type=str, help="Directory to save the data")
     parser.add_argument("--num_samples", type=int, default=20, help="Number of samples to generate")
     parser.add_argument("--spectate", type=bool, default=False, help="True if you want to spectate the simulation while data is created.")
     parser.add_argument("--vehicle_id", type=int, default=29, help="ID of the vehicle to spawn")
@@ -40,12 +40,12 @@ def save_image(image):
         image: carla.Image - The image captured by the camera.
     """
     global image_name
-    global data_dir
+    global save_path
     global image_width
     global image_height
 
     current_time = int(time.time() * 1000)
-    image_path = f"{data_dir}/images/{current_time}.png"
+    image_path = f"{save_path}/images/{current_time}.png"
     image_name = f"{current_time}.png"
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
     image.save_to_disk(image_path)
@@ -378,7 +378,7 @@ def main(args):
         if images_to_delete > 0:
             time.sleep(2)
             # Get the list of image files in the output directory
-            image_files = sorted(glob.glob(f"{args.data_dir}/images/*.png"), key=os.path.getmtime)
+            image_files = sorted(glob.glob(f"{args.save_path}/images/*.png"), key=os.path.getmtime)
 
             # Delete the last "images_to_delete" number of images
             for image_file in image_files[-images_to_delete:]:
@@ -391,14 +391,14 @@ def main(args):
         if image_taken:
             cnt += 1
             # Save a json annotation file
-            if not os.path.exists(f"{args.data_dir}/annotations.json"):
+            if not os.path.exists(f"{args.save_path}/annotations.json"):
                 dataset = {
                     "question": args.question,
                     "distances": [50, 40, 30, 20, 10],
                     "samples": []
                 }
             else:
-                with open(f"{args.data_dir}/annotations.json") as f:
+                with open(f"{args.save_path}/annotations.json") as f:
                     dataset = json.load(f)
 
             annotations = {
@@ -411,7 +411,7 @@ def main(args):
 
             dataset["samples"].append(annotations)
 
-            with open(f"{args.data_dir}/annotations.json", "w") as f:
+            with open(f"{args.save_path}/annotations.json", "w") as f:
                 json.dump(dataset, f)
 
         # Clean up any remaining actors before next iteration
@@ -420,7 +420,7 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_arguments()
-    data_dir = args.data_dir
+    save_path = args.save_path
     image_width = args.image_width
     image_height = args.image_height
     main(args)
