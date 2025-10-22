@@ -56,11 +56,6 @@ Using the pre-configured Docker image is the simplest approach for generating mo
 
 Alternatively, you can install CARLA locally and run the scripts directly.
 
-#### Prerequisites
-- CARLA 0.9.15
-- Python 3.8.16
-- Conda (recommended for environment management)
-
 #### Installation Steps
 
 1. Install CARLA 0.9.15 following the [official installation guide](https://carla.readthedocs.io/en/0.9.15/)
