@@ -283,6 +283,7 @@ def main(args):
     cnt = 0
     # Main loop to collect samples
     while cnt < num_samples:
+        print(f"Generating sample {cnt + 1} / {args.num_samples}", end="\r")
         options = []
 
         # Find sign types that still have signs available
@@ -475,3 +476,4 @@ if __name__ == "__main__":
     image_width = args.image_width
     image_height = args.image_height
     main(args)
+    print("\nData generation completed.")

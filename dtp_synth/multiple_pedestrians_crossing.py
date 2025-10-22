@@ -169,6 +169,7 @@ def main(args):
 
     # Main loop to generate samples
     while cnt < args.num_samples:
+        print(f"Generating sample {cnt + 1} / {args.num_samples}", end="\r")
         try:
             # Set a random weather condition
             random_weather = random.choice(weather_conditions)
@@ -385,3 +386,4 @@ if __name__ == "__main__":
     image_width = args.image_width
     image_height = args.image_height
     main(args)
+    print("\nData generation completed.")
