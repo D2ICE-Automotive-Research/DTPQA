@@ -106,7 +106,6 @@ def select_waypoint_by_distance_and_yaw(waypoints, reference_location, min_dista
     ]
     
     if not filtered_waypoints:
-        print("No filtered waypoints found")
         return None
 
     # Select the waypoint with the smallest yaw difference relative to the target yaw.

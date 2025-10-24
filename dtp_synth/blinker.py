@@ -48,7 +48,6 @@ def save_image(image):
 
     current_time = int(time.time() * 1000)
     image_path = f'{draft_dir}/{current_time}.png'
-    os.makedirs(os.path.dirname(image_path), exist_ok=True)
     image.save_to_disk(image_path)
 
     with Image.open(image_path) as img:
@@ -133,7 +132,6 @@ def check_for_good_images(data_dir, draft_dir, blinker_annotations, distance, bl
         image_path = qualified_images[0][0]
         image_name = os.path.basename(image_path)
         new_image_path = os.path.join(f"{data_dir}/images", image_name)
-        os.makedirs(data_dir, exist_ok=True)
         os.rename(image_path, new_image_path)
         return image_name
     else:
@@ -142,7 +140,6 @@ def check_for_good_images(data_dir, draft_dir, blinker_annotations, distance, bl
         image_path = best_image[0]
         image_name = os.path.basename(image_path)
         new_image_path = os.path.join(f"{data_dir}/images", image_name)
-        os.makedirs(f"{data_dir}/images", exist_ok=True)
         os.rename(image_path, new_image_path)
         return image_name
         
@@ -427,6 +424,8 @@ def main(args):
 
 if __name__ == "__main__":
     args = parse_arguments()
+    os.makedirs(f"{args.save_path}/images", exist_ok=True)
+    os.makedirs(f"{args.save_path}/draft_images", exist_ok=True)
     draft_dir = args.save_path + "/draft_images"
     image_width = args.image_width
     image_height = args.image_height

@@ -23,53 +23,36 @@ Using the pre-configured Docker image is the simplest approach for generating mo
 
 1. **Pull the Docker image**:
 ```bash
-docker pull niktheod/dtp-synth-gen
+docker pull niktheod/dtp-synth-gen:1.0
 ```
 
 2. **Create and run the container**:
 ```bash
-docker run -it --gpus all -p 2000-2002:2000-2002 niktheod/dtp-synth-gen
+docker run --gpus all -p 2000-2002:2000-2002 --name dtp-synth-gen-cont niktheod/dtp-synth-gen:1.0 ./CarlaUE4.sh -RenderOffScreen
 ```
 
-3. **Create a directory for saving data inside the container**:
+3. **In a new terminal open an interactive shell inside the container**:
 ```bash
-mkdir /path/to/your/directory
+docker exec -it dtp-synth-gen-cont /bin/bash
 ```
 
-4. **Navigate to the dtp_synth directory**:
+4. **Activate the needed conda env and go to the needed directory**:
 ```bash
-cd dtp_synth
+conda activate dtp-synth
+cd /workspace/dtp_synth
 ```
 
 5. **Execute the desired data generation script** (example for pedestrian crossing):
 ```bash
-python pedestrian_crossing.py --map Town01 --save_path /path/to/your/directory
+python pedestrian_crossing.py --map Town01 --save_path /workspace/your_directory
 ```
 
 Repeat step 5 for other scripts to generate different types of DTP-Synth data.
 
-**Important:** If the simulator crashes follow these steps
-1. **Stop the container**:
-```bash
-docker stop <container-name>
+**Important:** If the simulator crashes simply restart the container and follow steps 3-5 above.
 ```
 
-2. **Restart the container**:
-```bash
-docker start <container-name>
-```
-
-3. **Open an interactive shell environment**:
-```bash
-docker exec -it <container-name> bash
-```
-
-4. **Execute the desired data generation script**:
-```bash
-python pedestrian_crossing.py --map Town01 --save_path /path/to/your/directory
-```
-
-**Important:** The Docker image includes only the base CARLA maps (Town01-07, Town10HD). To use additional maps (Town11, Town12, Town13, Town15), you must manually import them into the container.
+**Important:** The Docker image includes only the base CARLA maps (Town01-05, Town10HD). To use additional maps (Town06, Town07, Town11, Town12, Town13, Town15), you must manually import them into the container.
 
 ### Method 2: Local Installation
 
