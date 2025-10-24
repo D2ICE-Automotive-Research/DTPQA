@@ -31,12 +31,12 @@ docker pull niktheod/dtp-synth-gen:1.0
 docker run --gpus all -p 2000-2002:2000-2002 --name dtp-synth-gen-cont niktheod/dtp-synth-gen:1.0 ./CarlaUE4.sh -RenderOffScreen
 ```
 
-3. **In a new terminal open an interactive shell inside the container**:
+3. **Open a new terminal and access the container**:
 ```bash
 docker exec -it dtp-synth-gen-cont /bin/bash
 ```
 
-4. **Activate the needed conda env and go to the needed directory**:
+4. **Activate the Conda environment and navigate to the workspace**:
 ```bash
 conda activate dtp-synth
 cd /workspace/dtp_synth
@@ -49,7 +49,7 @@ python pedestrian_crossing.py --map Town01 --save_path /workspace/your_directory
 
 Repeat step 5 for other scripts to generate different types of DTP-Synth data.
 
-**Important:** If the simulator crashes simply restart the container and follow steps 3-5 above.
+**Note:** If the simulator crashes, simply restart the container and repeat steps 3–5.
 ```
 
 **Important:** The Docker image includes only the base CARLA maps (Town01-05, Town10HD). To use additional maps (Town06, Town07, Town11, Town12, Town13, Town15), you must manually import them into the container.
