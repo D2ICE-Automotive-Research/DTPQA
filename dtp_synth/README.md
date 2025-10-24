@@ -50,7 +50,6 @@ python pedestrian_crossing.py --map Town01 --save_path /workspace/your_directory
 Repeat step 5 for other scripts to generate different types of DTP-Synth data.
 
 **Note:** If the simulator crashes, simply restart the container and repeat steps 3–5.
-```
 
 **Important:** The Docker image includes only the base CARLA maps (Town01-05, Town10HD). To use additional maps (Town06, Town07, Town11, Town12, Town13, Town15), you must manually import them into the container.
 
