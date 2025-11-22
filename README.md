@@ -24,8 +24,15 @@ DTPQA consists of two main components:
 This repository provides scripts for both the **DTP-Synth** and **DTP-Real** datasets.  
 See the corresponding directories for detailed instructions on how to run the generation pipelines.
 
-## Cite this dataset
+## BibTeX
 ```
-Theodoridis, Nikos; Brophy, Tim; Mohandas, Reenu; Sistu, Ganesh; Collins, Fiachra; Scanlan, Tony; Eising, Ciaran (2025),
-“Distance-Annotated Traffic Perception Question Answering (DTPQA)”, Mendeley Data, V1, doi: 10.17632/9rj4kyrx9k.1
+@misc{theodoridis2025descriptordistanceannotatedtrafficperception,
+      title={Descriptor: Distance-Annotated Traffic Perception Question Answering (DTPQA)}, 
+      author={Nikos Theodoridis and Tim Brophy and Reenu Mohandas and Ganesh Sistu and Fiachra Collins and Anthony Scanlan and Ciaran Eising},
+      year={2025},
+      eprint={2511.13397},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2511.13397}, 
+}
 ```
