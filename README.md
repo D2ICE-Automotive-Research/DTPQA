@@ -2,7 +2,7 @@
 
 ## 📄 Paper & Dataset
 - 📜 **Paper**: [Read here](https://arxiv.org/abs/2511.13397)  
-- 📁 **Dataset**: [Access here](https://data.mendeley.com/datasets/9rj4kyrx9k/1)
+- 📁 **Dataset**: [Access here](https://data.mendeley.com/datasets/9rj4kyrx9k/2)
 
 This repository contains the code used to generate **DTPQA**, a Visual Question Answering (VQA) benchmark designed to evaluate the **perception capabilities of Vision-Language Models (VLMs)** in traffic scenes.  
 DTPQA consists of two main components:  
